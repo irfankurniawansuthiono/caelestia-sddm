@@ -79,7 +79,7 @@ Rectangle {
                 Image {
                     id: avatarImage
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.margins: 22
                     source: {
                         if (userPicker.currentIndex !== -1) {
                             var icon = userModel.data(userModel.index(userPicker.currentIndex, 0), Qt.UserRole + 2);
@@ -171,18 +171,26 @@ Rectangle {
                     onClicked: sddm.powerOff()
                     background: Item {}
                     contentItem: Text {
-                        text: "⏻"
-                        font.pixelSize: 36
+
+                        text: "\ue8ac"
+                        font.family: "Material Symbols Outlined"
+                        font.pixelSize: 42
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
                         color: shutBtn.hovered ? "#ffb4ab" : "#e2e2e2"
                     }
                 }
+
                 Button {
                     id: rebBtn
                     onClicked: sddm.reboot()
                     background: Item {}
                     contentItem: Text {
-                        text: "↻"
-                        font.pixelSize: 36
+                        text: "\uf053"
+                        font.family: "Material Symbols Outlined"
+                        font.pixelSize: 42
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
                         color: rebBtn.hovered ? "#4cdadb" : "#e2e2e2"
                     }
                 }
@@ -201,15 +209,40 @@ Rectangle {
 
                 background: Rectangle {
                     color: "#131313"
-                    radius: 25
+                    radius: 20
                     border.color: "#353535"
+                    border.width: 1
                 }
+
                 contentItem: Text {
                     text: sessionPicker.displayText
-                    color: "#4cdadb"
                     font: sessionPicker.font
+                    color: "#4cdadb"
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
+
+                    leftPadding: 0
+                    rightPadding: 0
+
+                    anchors.fill: parent
+                }
+
+                indicator: Canvas {
+                    id: canvas
+                    x: sessionPicker.width - 24
+                    y: (sessionPicker.height - 6) / 2
+                    width: 10
+                    height: 6
+                    onPaint: {
+                        var context = getContext("2d");
+                        context.reset();
+                        context.moveTo(0, 0);
+                        context.lineTo(width, 0);
+                        context.lineTo(width / 2, height);
+                        context.closePath();
+                        context.fillStyle = "#353535";
+                        context.fill();
+                    }
                 }
             }
         }
