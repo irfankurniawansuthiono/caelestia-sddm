@@ -8,11 +8,9 @@ Rectangle {
     height: 1080
     color: "#131313"
 
-    // 1. Background Image (NOW INSIDE ROOT)
     Image {
         id: background
         anchors.fill: parent
-        // Use a fallback color if the file is missing
         source: "assets/background.png"
         fillMode: Image.PreserveAspectCrop
 
@@ -28,7 +26,6 @@ Rectangle {
         }
     }
 
-    // 2. Central Bordered Card
     Rectangle {
         id: mainCard
         width: 550
@@ -44,7 +41,6 @@ Rectangle {
             anchors.margins: 40
             spacing: 30
 
-            // --- Digital Clock & Date ---
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: 10
@@ -84,7 +80,6 @@ Rectangle {
                     id: avatarImage
                     anchors.fill: parent
                     anchors.margins: (avatarFrame.width - 160) / 2
-                    // SAFE LOGIC: Check if userPicker and currentItem exist first
                     source: {
                         if (userPicker.count > 0 && userPicker.currentIndex !== -1) {
                             var user = userPicker.model[userPicker.currentIndex];
@@ -97,7 +92,6 @@ Rectangle {
                 }
             }
 
-            // --- User Picker ---
             ComboBox {
                 id: userPicker
                 Layout.alignment: Qt.AlignHCenter
@@ -116,25 +110,20 @@ Rectangle {
                     border.width: 1
                 }
 
-                // This is the part that handles the centering
                 contentItem: Text {
                     text: userPicker.displayText
                     font: userPicker.font
                     color: "#e2e2e2"
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
-
-                    // Hard-reset all paddings to 0
                     leftPadding: 0
                     rightPadding: 0
                     topPadding: 0
                     bottomPadding: 0
 
-                    // This ensures the text ignores the indicator's width
                     anchors.fill: parent
                 }
 
-                // Muted indicator shifted to the edge so it doesn't crowd the text
                 indicator: Canvas {
                     x: userPicker.width - 30
                     y: (userPicker.height - 6) / 2
@@ -153,7 +142,6 @@ Rectangle {
                 }
             }
 
-            // --- Password Field ---
             TextField {
                 id: passwordField
                 Layout.alignment: Qt.AlignHCenter
@@ -175,7 +163,6 @@ Rectangle {
                 onAccepted: sddm.login(userPicker.currentText, text, sessionPicker.currentIndex)
             }
 
-            // --- Action Icons ---
             Row {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: 50
@@ -201,7 +188,6 @@ Rectangle {
                 }
             }
 
-            // --- Session Picker ---
             ComboBox {
                 id: sessionPicker
                 Layout.alignment: Qt.AlignHCenter
