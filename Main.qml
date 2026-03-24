@@ -79,15 +79,15 @@ Rectangle {
                 Image {
                     id: avatarImage
                     anchors.fill: parent
-                    anchors.margins: (avatarFrame.width - 160) / 2
+                    anchors.margins: 10
                     source: {
-                        if (userPicker.count > 0 && userPicker.currentIndex !== -1) {
-                            var user = userPicker.model[userPicker.currentIndex];
-                            return (user && user.icon) ? user.icon : "assets/logo.png";
+                        if (userPicker.currentIndex !== -1) {
+                            var icon = userModel.data(userModel.index(userPicker.currentIndex, 0), Qt.UserRole + 2);
+                            return (icon && icon !== "") ? "file://" + icon : "assets/logo.png";
                         }
                         return "assets/logo.png";
                     }
-                    fillMode: Image.PreserveAspectCrop
+                    fillMode: Image.PreserveAspectFit
                     asynchronous: true
                 }
             }
