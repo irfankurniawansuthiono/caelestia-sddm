@@ -1,0 +1,231 @@
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+
+Rectangle {
+    id: root
+    width: 1920
+    height: 1080
+    color: "#131313"
+
+    // 1. Background Image (NOW INSIDE ROOT)
+    Image {
+        id: background
+        anchors.fill: parent
+        // Use a fallback color if the file is missing
+        source: "assets/background.png"
+        fillMode: Image.PreserveAspectCrop
+
+        onStatusChanged: {
+            if (status === Image.Error) {
+                console.log("Background missing, using fallback color");
+            }
+        }
+        Rectangle {
+            anchors.fill: parent
+            color: "#000000"
+            opacity: 0.4
+        }
+    }
+
+    // 2. Central Bordered Card
+    Rectangle {
+        id: mainCard
+        width: 550
+        height: 850
+        anchors.centerIn: parent
+        color: "#e61b1b1b"
+        radius: 30
+        border.color: "#994cdadb"
+        border.width: 3
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 40
+            spacing: 30
+
+            // --- Digital Clock & Date ---
+            ColumnLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 10
+                Text {
+                    id: clock
+                    Layout.alignment: Qt.AlignHCenter
+                    text: Qt.formatTime(new Date(), "hh:mm AP")
+                    style: Text.Outline
+                    styleColor: "#000000"
+                    font.pixelSize: 84
+                    font.family: "JetBrains Mono"
+                    color: "#e2e2e2"
+                }
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: Qt.formatDate(new Date(), "dddd, d MMMM yyyy")
+                    style: Text.Outline
+                    styleColor: "#000000"
+                    font.pixelSize: 22
+                    font.family: "JetBrains Mono"
+                    color: "#919191"
+                }
+            }
+
+            Rectangle {
+                id: avatarFrame
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 220
+                Layout.preferredHeight: 220
+                radius: 110
+                color: "#131313"
+                border.color: "#4cdadb"
+                border.width: 2
+                clip: true
+
+                Image {
+                    id: avatarImage
+                    anchors.fill: parent
+                    anchors.margins: (avatarFrame.width - 160) / 2
+                    // SAFE LOGIC: Check if userPicker and currentItem exist first
+                    source: {
+                        if (userPicker.count > 0 && userPicker.currentIndex !== -1) {
+                            var user = userPicker.model[userPicker.currentIndex];
+                            return (user && user.icon) ? user.icon : "assets/logo.png";
+                        }
+                        return "assets/logo.png";
+                    }
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                }
+            }
+
+            // --- User Picker ---
+            ComboBox {
+                id: userPicker
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 380
+                Layout.preferredHeight: 55
+                model: userModel
+                currentIndex: userModel.lastIndex
+                textRole: "name"
+                font.family: "JetBrains Mono"
+                font.pixelSize: 20
+
+                background: Rectangle {
+                    color: "#131313"
+                    radius: 30
+                    border.color: "#353535"
+                    border.width: 1
+                }
+
+                // This is the part that handles the centering
+                contentItem: Text {
+                    text: userPicker.displayText
+                    font: userPicker.font
+                    color: "#e2e2e2"
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+
+                    // Hard-reset all paddings to 0
+                    leftPadding: 0
+                    rightPadding: 0
+                    topPadding: 0
+                    bottomPadding: 0
+
+                    // This ensures the text ignores the indicator's width
+                    anchors.fill: parent
+                }
+
+                // Muted indicator shifted to the edge so it doesn't crowd the text
+                indicator: Canvas {
+                    x: userPicker.width - 30
+                    y: (userPicker.height - 6) / 2
+                    width: 12
+                    height: 6
+                    onPaint: {
+                        var context = getContext("2d");
+                        context.reset();
+                        context.moveTo(0, 0);
+                        context.lineTo(width, 0);
+                        context.lineTo(width / 2, height);
+                        context.closePath();
+                        context.fillStyle = "#353535";
+                        context.fill();
+                    }
+                }
+            }
+
+            // --- Password Field ---
+            TextField {
+                id: passwordField
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 380
+                Layout.preferredHeight: 55
+                echoMode: TextInput.Password
+                placeholderText: "Password"
+                placeholderTextColor: "#595959"
+                font.family: "JetBrains Mono"
+                font.pixelSize: 22
+                color: "#e2e2e2"
+                horizontalAlignment: TextInput.AlignHCenter
+
+                background: Rectangle {
+                    color: "#131313"
+                    radius: 35
+                    border.color: passwordField.activeFocus ? "#4cdadb" : "#353535"
+                }
+                onAccepted: sddm.login(userPicker.currentText, text, sessionPicker.currentIndex)
+            }
+
+            // --- Action Icons ---
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 50
+                Button {
+                    id: shutBtn
+                    onClicked: sddm.powerOff()
+                    background: Item {}
+                    contentItem: Text {
+                        text: "⏻"
+                        font.pixelSize: 36
+                        color: shutBtn.hovered ? "#ffb4ab" : "#e2e2e2"
+                    }
+                }
+                Button {
+                    id: rebBtn
+                    onClicked: sddm.reboot()
+                    background: Item {}
+                    contentItem: Text {
+                        text: "↻"
+                        font.pixelSize: 36
+                        color: rebBtn.hovered ? "#4cdadb" : "#e2e2e2"
+                    }
+                }
+            }
+
+            // --- Session Picker ---
+            ComboBox {
+                id: sessionPicker
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 220
+                Layout.preferredHeight: 40
+                model: sessionModel
+                currentIndex: sessionModel.lastIndex
+                textRole: "name"
+                font.family: "JetBrains Mono"
+                font.pixelSize: 18
+
+                background: Rectangle {
+                    color: "#131313"
+                    radius: 25
+                    border.color: "#353535"
+                }
+                contentItem: Text {
+                    text: sessionPicker.displayText
+                    color: "#4cdadb"
+                    font: sessionPicker.font
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+        }
+    }
+}
