@@ -43,4 +43,4 @@ for everyone not on Caelestia Shell:
 * **SDDM** duh
 * **qt6-svg**
 * **qt6-virtualkeyboard**
-* **JetBrains Mono Font**
+* **Rubik Font**
