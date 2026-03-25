@@ -35,16 +35,15 @@ Rectangle {
         border.color: "#BF4cdadb"
         border.width: 1
 
-        // Native QML vertical gradient
         gradient: Gradient {
             GradientStop {
                 position: 0.5
                 color: "#BF1b1b1b"
-            } // Top (Dark)
+            }
             GradientStop {
                 position: 1.0
                 color: "#BF4cdadb"
-            } // Bottom (Cyan)
+            }
         }
 
         ColumnLayout {
