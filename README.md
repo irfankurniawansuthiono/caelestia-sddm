@@ -39,7 +39,7 @@ Current=caelestia
 
 ## 🤝 Requirements
 
-Caelestia shell meets all the basic requirements, don't you worry!
+Caelestia shell meets all the basic requirements, except for SDDM(which is a requirement or an SDDM theme).
 
 for everyone not on Caelestia Shell:
 * **SDDM** duh
