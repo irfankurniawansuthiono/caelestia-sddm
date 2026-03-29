@@ -14,7 +14,9 @@ A sleek, obsidian-inspired login interface designed specifically for **Caelestia
 
 ## 🛠️ Installation
 
-`sudo cp -r ~/projects/caelestia-sddm /usr/share/sddm/themes/caelestia`
+### Clone this git to ~/caelestia-sddm
+
+`sudo cp -r ~/caelestia-sddm /usr/share/sddm/themes/caelestia`
 
 Edit /etc/sddm.conf (or /etc/sddm.conf.d/theme.conf):
 
