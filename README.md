@@ -35,20 +35,36 @@ The provided installer handles all dependencies, system configurations, and perm
 
 ## 🔄 How the Sync Works
 
-[cite_start]This theme includes a systemd service (`caelestia-sync.service`) that triggers during the shutdown/reboot process[cite: 96]. It identifies the active user, pulls the latest wallpaper and theme configuration from the Caelestia state folder, and applies them to the login screen for your next boot.
+This theme already includes a systemd service (`caelestia-sync.service`) that triggers during the shutdown/reboot process. It identifies the active user, pulls the latest wallpaper and theme configuration from the Caelestia state folder, and applies them to the login screen for your next boot.
 
 **Manual Sync:**
 If you want to apply changes immediately without rebooting, run:
 ```bash
-/usr/share/sddm/themes/caelestia/scripts/sync.sh
+sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh
+```
+
+**Automatic Posthook:**
+If you want to apply changes immediately without rebooting, after setting wallpaper, set:
+inside `~/.config/caelestia/cli.json`:
+```json
+"wallpaper": {
+    "_postHook": "echo $WALLPAPER_PATH",
+    "postHook": "sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh"
+},
 ```
 
 ## ⚙️ Configuration
 
-To customize the theme settings, you have two options:
+To Customize the theme config modify it ONLY through the Caelestia config:
 
-1. **Edit the template and reinstall:** Modify [theme.conf.template](theme.conf.template) in the source directory, then copy the theme again to `/usr/share/sddm/themes/caelestia`
-2. **Edit directly (recommended):** Modify `sddm-theme.conf` in your Caelestia config folder at `~/.config/caelestia/sddm-theme.conf` for changes that persist without reinstallation
+1. Edit `~/.config/caelestia/sddm-theme.conf`
+2. Select a wallpaper (to tigger color generation)
+2. Apply sync:
+   ```bash
+   sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh
+   ```
+
+Do not edit `/usr/share/sddm/themes/caelestia/theme.conf` directly, since this will be overwritten by Caelestia templating system.
 
 ## 🧪 TESTING- Preview the theme without logging out
 
@@ -64,5 +80,5 @@ for everyone not on Caelestia Shell:
 * **ffmpeg**
 * **qt6-svg**
 * **qt6-virtualkeyboard**
-* **Rubik Font** (default, preferred)
-* **System Sans fallback** (automatic if Rubik is unavailable)
+* **Material Symbols Outlined** (required for power/reboot icons)
+* **Rubik Font** (default texts)
