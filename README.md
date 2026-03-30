@@ -6,8 +6,8 @@ A sleek, obsidian-inspired login interface designed specifically for **Caelestia
 
 ## ✨ Features
 
-* **Obsidian UI:** Deep surfaces using `#131313` for a true dark-mode experience.
-* **Cyan Accents:** Interactive elements highlighted with Caelestia Cyan (`#4cdadb`).
+* **Dynamic Gradient UI:** Deep surfaces using dynamic colors.
+* **Dynamic Accents:** Interactive elements highlighted with Caelestia's dynamic primary color.
 * **Glassmorphism:** Translucent central card (80% opacity) for background integration.
 * **Optimized for Arch:** Lightweight QML implementation with Virtual Keyboard support.
 * **Smart Fallback:** Automatically uses system avatars or falls back to the Caelestia logo.
@@ -25,6 +25,19 @@ Edit /etc/sddm.conf (or /etc/sddm.conf.d/theme.conf):
 Current=caelestia
 ```
 
+### To sync wallpaper and colors
+```
+# run the sync script
+./sync.sh
+```
+
+## ⚙️ Configuration
+
+To customize the theme settings, you have two options:
+
+1. **Edit the template and reinstall:** Modify [theme.conf.template](theme.conf.template) in the source directory, then copy the theme again to `/usr/share/sddm/themes/caelestia`
+2. **Edit directly (recommended):** Modify `sddm-theme.conf` in your Caelestia config folder at `~/.config/caelestia/sddm-theme.conf` for changes that persist without reinstallation
+
 ## 🧪 TESTING- Preview the theme without logging out
 
 `sddm-greeter --test-mode --theme /usr/share/sddm/themes/caelestia`
@@ -37,4 +50,5 @@ for everyone not on Caelestia Shell:
 * **SDDM** duh
 * **qt6-svg**
 * **qt6-virtualkeyboard**
-* **Rubik Font**
+* **JetBrains Mono Font** (preferred)
+* **Rubik Font** (fallback, optional)
