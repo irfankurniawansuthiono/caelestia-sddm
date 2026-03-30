@@ -1,17 +1,145 @@
-#!/bin/bash
-# Simple script to check if the SDDM theme is installed correctly and if there are any issues with SDDM logs or configuration.
+#!/usr/bin/env bash
 
-echo "=== Checking SDDM Theme Installation ==="
-echo "Theme directory exists:"
-ls -la /usr/share/sddm/themes/caelestia/ 2>/dev/null && echo "✓ Found" || echo "✗ Missing"
-echo -e "\n=== Checking SDDM Config ==="
-if grep -rq "^Current=" /etc/sddm.conf /etc/sddm.conf.d/ 2>/dev/null; then
-    echo "✓ Found"
+THEME_NAME="caelestia"
+THEME_DIR="/usr/share/sddm/themes/${THEME_NAME}"
+SERVICE_NAME="caelestia-sync.service"
+
+failures=0
+warnings=0
+
+ok() {
+    printf '[OK] %s\n' "$1"
+}
+
+warn() {
+    printf '[WARN] %s\n' "$1"
+    warnings=$((warnings + 1))
+}
+
+fail() {
+    printf '[FAIL] %s\n' "$1"
+    failures=$((failures + 1))
+}
+
+check_file() {
+    local path="$1"
+    if [ -f "$path" ]; then
+        ok "Found $path"
+    else
+        fail "Missing $path"
+    fi
+}
+
+echo "=== Caelestia SDDM Theme Check ==="
+
+echo
+echo "--- Theme files ---"
+if [ -d "$THEME_DIR" ]; then
+    ok "Theme directory exists: $THEME_DIR"
 else
-    echo "✗ Missing"
+    fail "Theme directory missing: $THEME_DIR"
 fi
-echo -e "\n=== Checking Required Fonts ==="
-fc-list | grep -i "jetbrains mono" && echo "✓ JetBrains Mono" || echo "✗ JetBrains Mono missing"
-fc-list | grep -i "material" && echo "✓ Material font" || echo "✗ Material font missing"
-echo -e "\n=== Recent SDDM Errors ==="
-sudo journalctl -u sddm -b -0 --no-pager | grep -i "error\|warning\|fail" | tail -20
+
+check_file "$THEME_DIR/Main.qml"
+check_file "$THEME_DIR/metadata.desktop"
+check_file "$THEME_DIR/theme.conf"
+check_file "$THEME_DIR/assets/background.png"
+check_file "$THEME_DIR/assets/logo.png"
+
+if [ -x "$THEME_DIR/scripts/sync.sh" ]; then
+    ok "sync.sh is executable"
+else
+    warn "sync.sh is not executable (needed by caelestia-sync service)"
+fi
+
+echo
+echo "--- Theme config activation ---"
+current_matches=()
+config_candidates=(
+    "/etc/sddm.conf"
+    "/etc/sddm.conf.d/*.conf"
+    "/usr/lib/sddm/sddm.conf.d/default.conf"
+)
+
+for pattern in "${config_candidates[@]}"; do
+    for cfg in $pattern; do
+        [ -f "$cfg" ] || continue
+        if grep -Eq '^Current=caelestia$' "$cfg"; then
+            current_matches+=("$cfg")
+        fi
+    done
+done
+
+if [ "${#current_matches[@]}" -gt 0 ]; then
+    ok "Current=caelestia found in:"
+    for cfg in "${current_matches[@]}"; do
+        printf '  - %s\n' "$cfg"
+    done
+else
+    fail "No SDDM config sets Current=caelestia"
+fi
+
+echo
+echo "--- Fonts required by Main.qml ---"
+if fc-list | grep -iq 'Material Symbols Outlined'; then
+    ok "Material Symbols Outlined is installed"
+else
+    fail "Material Symbols Outlined missing (power/reboot icons will not render)"
+fi
+
+if fc-list | grep -Eiq 'JetBrains Mono|Rubik|Noto Sans|DejaVu Sans|Sans'; then
+    ok "At least one UI text fallback font is installed"
+else
+    fail "No usable UI text fallback font found"
+fi
+
+echo
+echo "--- Dependencies from install.sh ---"
+if command -v pacman >/dev/null 2>&1; then
+    dep_fail=0
+    for pkg in sddm qt6-svg qt6-virtualkeyboard ffmpeg; do
+        if pacman -Q "$pkg" >/dev/null 2>&1; then
+            ok "Package installed: $pkg"
+        else
+            fail "Package missing: $pkg"
+            dep_fail=1
+        fi
+    done
+    if [ "$dep_fail" -eq 0 ]; then
+        ok "All install.sh dependencies are present"
+    fi
+else
+    warn "pacman not found, skipping package checks"
+fi
+
+echo
+echo "--- Optional service check ---"
+if [ -f "/etc/systemd/system/${SERVICE_NAME}" ]; then
+    ok "Service file exists: /etc/systemd/system/${SERVICE_NAME}"
+    if systemctl is-enabled "$SERVICE_NAME" >/dev/null 2>&1; then
+        ok "Service is enabled: $SERVICE_NAME"
+    else
+        warn "Service is not enabled: $SERVICE_NAME"
+    fi
+else
+    warn "Service file missing: /etc/systemd/system/${SERVICE_NAME}"
+fi
+
+echo
+echo "--- Recent SDDM log issues ---"
+if journalctl -u sddm -b --no-pager >/dev/null 2>&1; then
+    journalctl -u sddm -b --no-pager | grep -Ei 'error|warning|fail' | tail -20
+else
+    warn "Could not read journalctl for sddm (try with sudo)"
+fi
+
+echo
+echo "=== Result ==="
+printf 'Failures: %d\n' "$failures"
+printf 'Warnings: %d\n' "$warnings"
+
+if [ "$failures" -gt 0 ]; then
+    exit 1
+fi
+
+exit 0

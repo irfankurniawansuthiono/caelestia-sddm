@@ -9,9 +9,9 @@ THEME_NAME="caelestia"
 
 # --- Dependency Check ---
 DEPENDENCIES=(
-    "sddm" 
-    "qt6-svg" 
-    "qt6-virtualkeyboard" 
+    "sddm"
+    "qt6-svg"
+    "qt6-virtualkeyboard"
     "ffmpeg"
 )
 
@@ -41,7 +41,13 @@ echo "🌌 Installing Caelestia SDDM Theme..."
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r "$PROJECT_ROOT"/* "$INSTALL_DIR/"
 
-# 2. Install the Systemd Service from the /components folder
+# 2. Create template configuration in user's home directory
+echo "Creating color template configuration..."
+mkdir -p "$HOME/.config/caelestia/templates"
+cp "$INSTALL_DIR/theme.conf.template" "$HOME/.config/caelestia/templates/sddm-theme.conf"
+echo "✓ Template created at ~/.config/caelestia/templates/sddm-theme.conf"
+
+# 3. Install the Systemd Service from the /components folder
 if [ -f "$PROJECT_ROOT/components/caelestia-sync.service" ]; then
     sudo cp "$PROJECT_ROOT/components/caelestia-sync.service" /etc/systemd/system/
     sudo systemctl daemon-reload
@@ -52,22 +58,37 @@ else
     exit 1
 fi
 
-# 3. Fix permissions so sync.sh can update assets without sudo later
+# 4. Fix permissions so sync.sh can update assets without sudo later
 sudo chown -R root:root "$INSTALL_DIR"
 sudo chmod -R 755 "$INSTALL_DIR"
 sudo chmod -R 777 "$INSTALL_DIR/assets"
 sudo chmod 666 "$INSTALL_DIR/theme.conf"
 sudo chmod +x "$INSTALL_DIR/scripts/sync.sh"
 
+#5. Set the Current theme to Caelestia in SDDM configuration
 # Force Current theme in all possible config locations
-for config in /etc/sddm.conf /usr/lib/sddm/sddm.conf.d/default.conf; do
+for config in /usr/lib/sddm/sddm.conf.d/default.conf; do
     if [ -f "$config" ]; then
         sudo sed -i 's/^Current=.*/Current=caelestia/' "$config"
     fi
 done
 
+# Handle /etc/sddm.conf - create or update
+if [ -f /etc/sddm.conf ]; then
+    # File exists, update the Current setting
+    sudo sed -i 's/^Current=.*/Current=caelestia/' /etc/sddm.conf
+    echo "✓ Updated /etc/sddm.conf"
+else
+    # File doesn't exist, create it
+    echo -e "[Theme]\nCurrent=caelestia" | sudo tee /etc/sddm.conf > /dev/null
+    echo "✓ Created /etc/sddm.conf"
+fi
+
 # Ensure the drop-in exists too
+sudo mkdir -p /etc/sddm.conf.d
 echo -e "[Theme]\nCurrent=caelestia" | sudo tee /etc/sddm.conf.d/caelestia.conf > /dev/null
+echo "✓ Created /etc/sddm.conf.d/caelestia.conf"
+
 
 echo "✅ Installation Complete! Use './scripts/check.sh' to verify."
 echo "Set: Current=$THEME_NAME"

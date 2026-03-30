@@ -19,10 +19,10 @@ if [[ -f "$CAEL_STATE/wallpaper/current" ]]; then
     FILENAME=$(basename "$(readlink -f "$CAEL_STATE/wallpaper/current")")
     EXT="${FILENAME##*.}"
     TARGET="background.$EXT"
-    
+
     # Clean out old backgrounds to prevent collisions
     rm -f "$THEME_DIR/assets/background."*
-    
+
     # Copy and set permissions
     cp -f "$CAEL_STATE/wallpaper/current" "$THEME_DIR/assets/$TARGET"
     chmod 644 "$THEME_DIR/assets/$TARGET"
