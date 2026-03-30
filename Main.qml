@@ -1,7 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtMultimedia 6.0
 
 Rectangle {
     id: root
@@ -123,26 +122,7 @@ Rectangle {
             visible: !backgroundContainer.isVideo && !backgroundContainer.isGif
             asynchronous: true
         }
-
-        // Animated GIF Support. trying to please everyone i guess.
-        AnimatedImage {
-            anchors.fill: parent
-            source: backgroundContainer.src
-            fillMode: Image.PreserveAspectCrop
-            visible: backgroundContainer.isGif
-        }
-
-        // Video Background Support because someone will not pick this shit.
-        Video {
-            anchors.fill: parent
-            source: backgroundContainer.src
-            fillMode: VideoOutput.PreserveAspectCrop
-            loops: MediaPlayer.Infinite
-            running: backgroundContainer.isVideo
-            autoPlay: true
-            muted: true // Always mute login screens!
-            visible: backgroundContainer.isVideo
-        }
+        
     }
 
     Rectangle {
