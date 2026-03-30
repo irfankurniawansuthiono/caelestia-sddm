@@ -43,7 +43,29 @@ fi
 check_file "$THEME_DIR/Main.qml"
 check_file "$THEME_DIR/metadata.desktop"
 check_file "$THEME_DIR/theme.conf"
-check_file "$THEME_DIR/assets/background.png"
+check_background() {
+    local background_dir="$THEME_DIR/assets"
+    local found=0
+    local supported_formats=("png" "jpg" "jpeg" "webp" "avif")
+
+    if [ -d "$background_dir" ]; then
+        for ext in "${supported_formats[@]}"; do
+            for file in "$background_dir"/background."$ext" "$background_dir"/BACKGROUND."$ext"; do
+                if [ -f "$file" ]; then
+                    ok "Found background: $file"
+                    found=1
+                    break 2
+                fi
+            done
+        done
+    fi
+
+    if [ "$found" -eq 0 ]; then
+        fail "No background image found (checked: $(IFS=', '; echo "${supported_formats[*]}"))"
+    fi
+}
+
+check_background
 check_file "$THEME_DIR/assets/logo.png"
 
 if [ -x "$THEME_DIR/scripts/sync.sh" ]; then
