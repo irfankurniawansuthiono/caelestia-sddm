@@ -24,7 +24,6 @@ passwordInputRadius=20
 cardRadius=20
 
 # Default values
-Font="JetBrains Mono"
 FontSize=12
 AvatarSize=128
 
