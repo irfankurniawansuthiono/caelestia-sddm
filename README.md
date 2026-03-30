@@ -31,6 +31,13 @@ Current=caelestia
 ./sync.sh
 ```
 
+## ⚙️ Configuration
+
+To customize the theme settings, you have two options:
+
+1. **Edit the template and reinstall:** Modify [theme.conf.template](theme.conf.template) in the source directory, then copy the theme again to `/usr/share/sddm/themes/caelestia`
+2. **Edit directly (recommended):** Modify `sddm-theme.conf` in your Caelestia config folder at `~/.config/caelestia/sddm-theme.conf` for changes that persist without reinstallation
+
 ## 🧪 TESTING- Preview the theme without logging out
 
 `sddm-greeter --test-mode --theme /usr/share/sddm/themes/caelestia`
