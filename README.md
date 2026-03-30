@@ -48,10 +48,10 @@ If you want to apply changes immediately without rebooting, after setting wallpa
 inside `~/.config/caelestia/cli.json`:
 ```json
 "wallpaper": {
-    "_postHook": "echo $WALLPAPER_PATH",
     "postHook": "sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh"
 },
 ```
+> **For a deeper explanation of templating and sync flow, see [TEMPLATING.md](TEMPLATING.md).**
 
 ## ⚙️ Configuration
 
@@ -65,6 +65,7 @@ To Customize the theme config modify it ONLY through the Caelestia config:
    ```
 
 Do not edit `/usr/share/sddm/themes/caelestia/theme.conf` directly, since this will be overwritten by Caelestia templating system.
+
 
 ## 🧪 TESTING- Preview the theme without logging out
 
