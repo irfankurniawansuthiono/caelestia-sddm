@@ -248,7 +248,8 @@ Rectangle {
 
             Rectangle {
                 anchors.fill: parent
-                radius: cardRadius
+                anchors.margins: mainCard.border.width
+                radius: cardRadius - mainCard.border.width
                 opacity: cardOpacity
 
                 gradient: Gradient {
