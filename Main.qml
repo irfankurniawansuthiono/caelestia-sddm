@@ -18,9 +18,6 @@ Rectangle {
     property string fontFamily: {
         var availableFonts = Qt.fontFamilies();
         var family = config.fontFamily;
-        if (!family || family === "")
-            family = config.Font;
-
         if (family && family !== "") {
             family = family.toString().replace(/^"|"$/g, "");
             if (availableFonts.indexOf(family) !== -1)
@@ -38,28 +35,33 @@ Rectangle {
     property real passwordInputRadius: boundedNumber(config.passwordInputRadius, 20, 0, 64)
     property real cardRadius: boundedNumber(config.cardRadius, 30, 0, 80)
     // Colors
-    property color mPrimary: config.mPrimary ? config.mPrimary : (config.accent ? config.accent : "#4cdadb")
-    property color mOnPrimary: config.mOnPrimary ? config.mOnPrimary : "#002022"
-    property color mSecondary: config.mSecondary ? config.mSecondary : "#95f4f5"
-    property color mOnSecondary: config.mOnSecondary ? config.mOnSecondary : "#003738"
-    property color mTertiary: config.mTertiary ? config.mTertiary : "#86d0ff"
-    property color mOnTertiary: config.mOnTertiary ? config.mOnTertiary : "#00344d"
-    property color mError: config.mError ? config.mError : (config.error ? config.error : "#ffb4ab")
-    property color mOnError: config.mOnError ? config.mOnError : "#690005"
-    property color mSurface: config.mSurface ? config.mSurface : (config.surface ? config.surface : "#131313")
-    property color mOnSurface: config.mOnSurface ? config.mOnSurface : (config.text ? config.text : "#e2e2e2")
-    property color mSurfaceVariant: config.mSurfaceVariant ? config.mSurfaceVariant : (config.surfaceVariant ? config.surfaceVariant : "#353535")
-    property color mOnSurfaceVariant: config.mOnSurfaceVariant ? config.mOnSurfaceVariant : (config.subtext ? config.subtext : "#919191")
-    property color mOutline: config.mOutline ? config.mOutline : "#7d7d7d"
-    property color mShadow: config.mShadow ? config.mShadow : "#000000"
-    property color mHover: config.mHover ? config.mHover : mPrimary
-    property color mOnHover: config.mOnHover ? config.mOnHover : mOnPrimary
+    property color mPrimary: config.mPrimary || "#4cdadb"
+    property color mOnPrimary: config.mOnPrimary || "#002022"
+    property color mSecondary: config.mSecondary || "#95f4f5"
+    property color mOnSecondary: config.mOnSecondary || "#003738"
+    property color mTertiary: config.mTertiary || "#86d0ff"
+    property color mOnTertiary: config.mOnTertiary || "#00344d"
+    property color mError: config.mError || "#ffb4ab"
+    property color mOnError: config.mOnError || "#690005"
+    property color mSurface: config.mSurface || "#131313"
+    property color mOnSurface: config.mOnSurface || "#e2e2e2"
+    property color mSurfaceVariant: config.mSurfaceVariant || "#353535"
+    property color mOnSurfaceVariant: config.mOnSurfaceVariant || "#919191"
+    property color mOutline: config.mOutline || "#7d7d7d"
+    property color mShadow: config.mShadow || "#000000"
+    property color mHover: config.mHover || mPrimary
+    property color mOnHover: config.mOnHover || mOnPrimary
     // Effects
     property bool dropShadows: toBool(config.dropShadows, true)
     property bool blurEnabled: toBool(config.blurEnabled, true)
-    property real blurStrength: boundedNumber(config.blurStrength, 1.0, 0, 1)
+    property real blurStrength: boundedNumber(config.blurStrength, 1, 0, 1)
     property real cardOpacity: boundedNumber(config.cardOpacity, 0.95, 0, 1)
     property real overlayOpacity: boundedNumber(config.overlayOpacity, 0.4, 0, 1)
+    // Animation durations
+    property int animDurationFast: 200
+    property int animDurationNormal: 300
+    property int animDurationSlow: 400
+    // State
     property bool firstInput: true
     property string buffer: ""
 
@@ -114,7 +116,7 @@ Rectangle {
         id: keyHandler
 
         focus: true
-        Keys.onPressed: {
+        Keys.onPressed: function(event) {
             if (root.firstInput) {
                 root.firstInput = false;
                 return ;
@@ -125,25 +127,27 @@ Rectangle {
                 return ;
             }
             if (event.key === Qt.Key_Right) {
-                if (userPicker.currentIndex < userModel.count - 1)
+                if (userModel.count > 0 && userPicker.currentIndex < userModel.count - 1) {
                     userPicker.currentIndex += 1;
-
+                    root.buffer = "";
+                }
                 return ;
             }
             if (event.key === Qt.Key_Left) {
-                if (userPicker.currentIndex > 0)
+                if (userModel.count > 0 && userPicker.currentIndex > 0) {
                     userPicker.currentIndex -= 1;
-
+                    root.buffer = "";
+                }
                 return ;
             }
             if (event.key === Qt.Key_Up) {
-                if (sessionPicker.currentIndex < sessionModel.count - 1)
+                if (sessionModel.count > 0 && sessionPicker.currentIndex < sessionModel.count - 1)
                     sessionPicker.currentIndex += 1;
 
                 return ;
             }
             if (event.key === Qt.Key_Down) {
-                if (sessionPicker.currentIndex > 0)
+                if (sessionModel.count > 0 && sessionPicker.currentIndex > 0)
                     sessionPicker.currentIndex -= 1;
 
                 return ;
@@ -157,7 +161,7 @@ Rectangle {
                 root.buffer = "";
                 return ;
             }
-            if (event.text && event.text !== "")
+            if (!root.firstInput && event.text && event.text !== "" && event.text.length === 1)
                 root.buffer += event.text;
 
         }
@@ -188,7 +192,7 @@ Rectangle {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 300
+                    duration: root.animDurationNormal
                 }
 
             }
@@ -208,7 +212,7 @@ Rectangle {
 
         Behavior on blur {
             NumberAnimation {
-                duration: 400
+                duration: root.animDurationSlow
             }
 
         }
@@ -244,28 +248,7 @@ Rectangle {
             radius: cardRadius
             border.color: withAlpha(mPrimary, cardOpacity)
             border.width: 1
-            color: "transparent"
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: mainCard.border.width
-                radius: cardRadius - mainCard.border.width
-                opacity: cardOpacity
-
-                gradient: Gradient {
-                    GradientStop {
-                        position: 0.5
-                        color: withAlpha(mSurface, 0.92)
-                    }
-
-                    GradientStop {
-                        position: 1
-                        color: withAlpha(mPrimary, 0.36)
-                    }
-
-                }
-
-            }
+            opacity: cardOpacity
 
             ColumnLayout {
                 anchors.fill: parent
@@ -278,12 +261,10 @@ Rectangle {
 
                     Text {
                         id: clock
-                        renderType: Text.NativeRendering
 
+                        renderType: Text.NativeRendering
                         Layout.alignment: Qt.AlignHCenter
                         text: Qt.formatTime(new Date(), "hh:mm AP")
-                        style: Text.Outline
-                        styleColor: mShadow
                         font.pixelSize: Math.round(baseFontSize * 7)
                         font.family: fontFamily
                         color: mOnSurface
@@ -309,15 +290,6 @@ Rectangle {
                     radius: avatarFrameSize / 2
                     color: withAlpha(mSurface, cardOpacity)
                     clip: true
-
-                    Rectangle {
-                        id: avatarMask
-
-                        anchors.fill: parent
-                        radius: avatarFrame.radius
-                        color: "white"
-                        visible: false
-                    }
 
                     Image {
                         id: avatarImage
@@ -390,7 +362,13 @@ Rectangle {
                         }
 
                         layer.effect: OpacityMask {
-                            maskSource: avatarMask
+
+                            maskSource: Rectangle {
+                                width: avatarImage.width
+                                height: avatarImage.height
+                                radius: avatarFrameSize / 2
+                            }
+
                         }
 
                     }
@@ -405,7 +383,7 @@ Rectangle {
 
                 }
 
-                ComboBox {
+                StyledComboBox {
                     id: userPicker
 
                     Layout.alignment: Qt.AlignHCenter
@@ -416,95 +394,7 @@ Rectangle {
                     textRole: "name"
                     font.family: fontFamily
                     font.pixelSize: Math.round(baseFontSize * 1.67)
-                    focusPolicy: Qt.ClickFocus
-                    onActivated: restoreFocus()
-
-                    Keys.onPressed: {
-                        if (!popup.visible) {
-                            if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                event.accepted = true;
-                                restoreFocus();
-                            }
-                        }
-                    }
-
-                    background: Rectangle {
-                        color: withAlpha(mSurface, cardOpacity)
-                        radius: passwordInputRadius
-                        border.color: mOutline
-                        border.width: 1
-                    }
-
-                    contentItem: Text {
-                        text: userPicker.displayText
-                        font: userPicker.font
-                        color: mOnSurface
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-                        leftPadding: 0
-                        rightPadding: 0
-                        topPadding: 0
-                        bottomPadding: 0
-                        anchors.fill: parent
-                    }
-
-                    indicator: Canvas {
-                        x: userPicker.width - 30
-                        y: (userPicker.height - 6) / 2
-                        width: 12
-                        height: 6
-                        onPaint: {
-                            var context = getContext("2d");
-                            context.reset();
-                            context.moveTo(0, 0);
-                            context.lineTo(width, 0);
-                            context.lineTo(width / 2, height);
-                            context.closePath();
-                            context.fillStyle = mPrimary;
-                            context.fill();
-                        }
-                    }
-
-                    delegate: ItemDelegate {
-                        width: userPicker.width
-
-                        contentItem: Text {
-                            text: model[userPicker.textRole]
-                            font: userPicker.font
-                            color: userPicker.highlightedIndex === index ? mOnPrimary : mOnSurface
-                            verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            anchors.fill: parent
-                        }
-
-                        background: Rectangle {
-                            color: userPicker.highlightedIndex === index ? mPrimary : "transparent"
-                            radius: passwordInputRadius
-                        }
-                    }
-
-                    popup: Popup {
-                        y: userPicker.height - 1
-                        width: userPicker.width
-                        implicitHeight: contentItem.implicitHeight
-
-                        contentItem: ListView {
-                            clip: true
-                            implicitHeight: Math.min(contentHeight, 250)
-                            model: userPicker.popup.visible ? userPicker.delegateModel : null
-                            currentIndex: userPicker.highlightedIndex
-
-                            ScrollIndicator.vertical: ScrollIndicator {}
-                        }
-
-                        background: Rectangle {
-                            color: withAlpha(mSurface, cardOpacity)
-                            border.color: mOutline
-                            border.width: 1
-                            radius: passwordInputRadius
-                        }
-                    }
-
+                    onRestoreFocus: restoreFocus
                 }
 
                 Rectangle {
@@ -547,7 +437,7 @@ Rectangle {
 
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: 100
+                                    duration: root.animDurationFast
                                 }
 
                             }
@@ -584,7 +474,7 @@ Rectangle {
                                 opacity: blink ? 1 : 0
 
                                 Timer {
-                                    running: true
+                                    running: cursorIndicator.visible
                                     repeat: true
                                     interval: 530
                                     onTriggered: cursorIndicator.blink = !cursorIndicator.blink
@@ -592,7 +482,7 @@ Rectangle {
 
                                 Behavior on opacity {
                                     NumberAnimation {
-                                        duration: 200
+                                        duration: root.animDurationFast
                                     }
 
                                 }
@@ -623,7 +513,7 @@ Rectangle {
 
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: 200
+                                    duration: root.animDurationFast
                                 }
 
                             }
@@ -642,7 +532,7 @@ Rectangle {
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: 200
+                                duration: root.animDurationFast
                             }
 
                         }
@@ -655,61 +545,31 @@ Rectangle {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 50
 
-                    Button {
+                    PowerButton {
                         id: shutBtn
 
-                        hoverEnabled: true
-                        focusPolicy: Qt.ClickFocus
-                        onClicked: {
+                        iconText: "\ue8ac"
+                        normalColor: mOnSurface
+                        hoverColor: mError
+                        onClickedAction: function() {
                             sddm.powerOff();
-                            restoreFocus();
                         }
-
-                        background: Rectangle {
-                            radius: buttonRadius
-                            color: "transparent"
-                        }
-
-                        contentItem: Text {
-                            text: "\ue8ac"
-                            font.family: "Material Symbols Outlined"
-                            font.pixelSize: Math.round(baseFontSize * 3.5)
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            color: (shutBtn.hovered || shutBtn.down) ? mError : mOnSurface
-                        }
-
                     }
 
-                    Button {
+                    PowerButton {
                         id: rebBtn
 
-                        hoverEnabled: true
-                        focusPolicy: Qt.ClickFocus
-                        onClicked: {
+                        iconText: "\uf053"
+                        normalColor: mOnSurface
+                        hoverColor: mHover
+                        onClickedAction: function() {
                             sddm.reboot();
-                            restoreFocus();
                         }
-
-                        background: Rectangle {
-                            radius: buttonRadius
-                            color: "transparent"
-                        }
-
-                        contentItem: Text {
-                            text: "\uf053"
-                            font.family: "Material Symbols Outlined"
-                            font.pixelSize: Math.round(baseFontSize * 3.5)
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            color: (rebBtn.hovered || rebBtn.down) ? mHover : mOnSurface
-                        }
-
                     }
 
                 }
 
-                ComboBox {
+                StyledComboBox {
                     id: sessionPicker
 
                     Layout.alignment: Qt.AlignHCenter
@@ -720,98 +580,20 @@ Rectangle {
                     textRole: "name"
                     font.family: fontFamily
                     font.pixelSize: Math.round(baseFontSize * 1.5)
-                    focusPolicy: Qt.ClickFocus
-                    onActivated: restoreFocus()
+                    onRestoreFocus: restoreFocus
+                }
 
-                    Keys.onPressed: {
-                        if (!popup.visible) {
-                            if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                event.accepted = true;
-                                restoreFocus();
-                            }
-                        }
-                    }
+            }
 
-                    background: Rectangle {
-                        color: withAlpha(mSurface, cardOpacity)
-                        radius: passwordInputRadius
-                        border.color: mOutline
-                        border.width: 1
-                    }
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.5
+                    color: withAlpha(mSurface, 0.92)
+                }
 
-                    contentItem: Text {
-                        text: sessionPicker.displayText
-                        font: sessionPicker.font
-                        color: mOnSurface
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Qt.AlignHCenter
-                        leftPadding: 15
-                        rightPadding: 15
-                        anchors.fill: parent
-                    }
-
-                    indicator: Canvas {
-                        id: canvas
-
-                        x: sessionPicker.width - width - 10
-                        y: (sessionPicker.height - height) / 2
-                        width: 10
-                        height: 6
-                        onPaint: {
-                            var context = getContext("2d");
-                            context.reset();
-                            context.moveTo(0, 0);
-                            context.lineTo(width, 0);
-                            context.lineTo(width / 2, height);
-                            context.closePath();
-                            context.fillStyle = mPrimary;
-                            context.fill();
-                        }
-                    }
-
-                    delegate: ItemDelegate {
-                        width: sessionPicker.width
-
-                        contentItem: Text {
-                            text: model[sessionPicker.textRole]
-                            font: sessionPicker.font
-                            color: sessionPicker.highlightedIndex === index ? mOnPrimary : mOnSurface
-                            verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Qt.AlignHCenter
-                            anchors.fill: parent
-                            anchors.leftMargin: 15
-                            anchors.rightMargin: 15
-                        }
-
-                        background: Rectangle {
-                            color: sessionPicker.highlightedIndex === index ? mPrimary : "transparent"
-                            radius: passwordInputRadius
-                        }
-
-                    }
-
-                    popup: Popup {
-                        width: sessionPicker.width
-                        implicitHeight: contentItem.implicitHeight
-
-                        contentItem: ListView {
-                            clip: true
-                            implicitHeight: Math.min(contentHeight, 250)
-                            model: sessionPicker.popup.visible ? sessionPicker.delegateModel : null
-                            currentIndex: sessionPicker.highlightedIndex
-
-                            ScrollIndicator.vertical: ScrollIndicator {}
-                        }
-
-                        background: Rectangle {
-                            color: withAlpha(mSurface, cardOpacity)
-                            border.color: mOutline
-                            border.width: 1
-                            radius: passwordInputRadius
-                        }
-
-                    }
-
+                GradientStop {
+                    position: 1
+                    color: withAlpha(mPrimary, 0.36)
                 }
 
             }
@@ -820,7 +602,7 @@ Rectangle {
 
         Behavior on scale {
             NumberAnimation {
-                duration: 300
+                duration: root.animDurationNormal
                 easing.type: Easing.OutBack
             }
 
@@ -828,7 +610,7 @@ Rectangle {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 300
+                duration: root.animDurationNormal
                 easing.type: Easing.OutBack
             }
 
@@ -850,7 +632,7 @@ Rectangle {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 300
+                duration: root.animDurationNormal
                 easing.type: Easing.OutCubic
             }
 

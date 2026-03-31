@@ -44,6 +44,9 @@ sudo mkdir -p "$INSTALL_DIR"
 
 # Copy core theme files
 sudo cp "$PROJECT_ROOT/Main.qml" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/StyledComboBox.qml" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/PowerButton.qml" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/qmldir" "$INSTALL_DIR/"
 sudo cp "$PROJECT_ROOT/caelestia-sddm.qmlproject" "$INSTALL_DIR/"
 sudo cp "$PROJECT_ROOT/metadata.desktop" "$INSTALL_DIR/"
 sudo cp "$PROJECT_ROOT/theme.conf" "$INSTALL_DIR/"
