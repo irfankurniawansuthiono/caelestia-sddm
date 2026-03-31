@@ -10,6 +10,8 @@ THEME_NAME="caelestia"
 # --- Dependency Check ---
 DEPENDENCIES=(
     "sddm"
+    "qt6-declarative"
+    "qt6-5compat"
     "qt6-svg"
     "qt6-virtualkeyboard"
     "ffmpeg"
