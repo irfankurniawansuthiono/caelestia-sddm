@@ -10,6 +10,8 @@ THEME_NAME="caelestia"
 # --- Dependency Check ---
 DEPENDENCIES=(
     "sddm"
+    "qt6-declarative"
+    "qt6-5compat"
     "qt6-svg"
     "qt6-virtualkeyboard"
     "ffmpeg"
@@ -40,6 +42,7 @@ echo "🌌 Installing Caelestia SDDM Theme..."
 # 1. Create theme directory and copy project files
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r "$PROJECT_ROOT"/* "$INSTALL_DIR/"
+echo "✓ Copied theme to $INSTALL_DIR"
 
 # 2. Create template configuration in user's home directory
 echo "Creating color template configuration..."

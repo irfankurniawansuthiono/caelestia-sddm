@@ -6,14 +6,30 @@ REAL_USER=$(ls /home | grep -v "lost+found" | head -n 1)
 REAL_HOME="/home/$REAL_USER"
 CAEL_STATE="$REAL_HOME/.local/state/caelestia"
 
-# 1. Sync Colors FIRST
-# We do this first so the wallpaper logic can override any hardcoded paths in this file
+# 1. Sync avatar files into theme assets so sddm can safely access them without permission issues.
+if [ -f "$REAL_HOME/.face.icon" ]; then
+    cp -f "$REAL_HOME/.face.icon" "$THEME_DIR/assets/avatar.face.icon"
+    chmod 644 "$THEME_DIR/assets/avatar.face.icon"
+    echo "✓ Synced avatar.face.icon"
+else
+    rm -f "$THEME_DIR/assets/avatar.face.icon"
+fi
+
+if [ -f "$REAL_HOME/.face" ]; then
+    cp -f "$REAL_HOME/.face" "$THEME_DIR/assets/avatar.face"
+    chmod 644 "$THEME_DIR/assets/avatar.face"
+    echo "✓ Synced avatar.face"
+else
+    rm -f "$THEME_DIR/assets/avatar.face"
+fi
+
+# 2. Sync Colors
 if [ -f "$CAEL_STATE/theme/sddm-theme.conf" ]; then
     cp -f "$CAEL_STATE/theme/sddm-theme.conf" "$THEME_DIR/theme.conf"
     chmod 644 "$THEME_DIR/theme.conf"
 fi
 
-# 2. Sync Wallpaper LAST
+# 3. Sync Wallpaper LAST
 if [[ -f "$CAEL_STATE/wallpaper/current" ]]; then
     # Detect extension and handle symlinks
     FILENAME=$(basename "$(readlink -f "$CAEL_STATE/wallpaper/current")")
