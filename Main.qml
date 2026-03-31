@@ -247,6 +247,51 @@ Rectangle {
 
     }
 
+    Text {
+        id: welcomeHeading
+
+        property var userName: {
+            if (userModel.count > 0 && userModel.lastIndex >= 0) {
+                var idx = userModel.index(userModel.lastIndex, 0);
+                return userModel.data(idx, Qt.UserRole + 1); // UserRole + 1 is the name role
+            }
+            return "";
+        }
+
+        renderType: Text.NativeRendering
+        anchors.centerIn: parent
+        text: userName ? "Welcome, " + userName : "Welcome"
+        font.family: fontFamily
+        font.pixelSize: Math.round(baseFontSize * 8)
+        font.weight: Font.DemiBold
+        color: mOnSurface
+        opacity: firstInput ? 1 : 0
+        scale: firstInput ? 1 : 0.8
+        layer.enabled: true
+        layer.effect: DropShadow {
+            transparentBorder: true
+            horizontalOffset: 0
+            verticalOffset: 6
+            radius: 24
+            samples: 40
+            color: withAlpha(mShadow, 0.65)
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: root.animDurationNormal
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: root.animDurationNormal
+                easing.type: Easing.OutCubic
+            }
+        }
+    }
+
     Item {
         id: cardContainer
 
