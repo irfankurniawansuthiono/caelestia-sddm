@@ -259,6 +259,9 @@ Rectangle {
                         function rebuildAvatarCandidates() {
                             var list = [];
 
+                            appendCandidate(list, "assets/avatar.face.icon");
+                            appendCandidate(list, "assets/avatar.face");
+
                             if (userPicker.currentIndex >= 0 && userPicker.currentIndex < userModel.count) {
                                 var modelIndex = userModel.index(userPicker.currentIndex, 0);
 
