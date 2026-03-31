@@ -1,3 +1,4 @@
+import "../singletons"
 import Qt5Compat.GraphicalEffects
 import QtQuick 2.15
 import QtQuick.Controls 2.15
@@ -6,9 +7,10 @@ Button {
     id: root
 
     property string iconText: ""
-    property color normalColor: mOnSurface
-    property color hoverColor: mPrimary
+    property color normalColor: Theme.mOnSurface
+    property color hoverColor: Theme.mPrimary
     property var onClickedAction: null
+    property var onRestoreFocus: null
 
     implicitWidth: 64
     implicitHeight: 64
@@ -18,7 +20,9 @@ Button {
         if (onClickedAction)
             onClickedAction();
 
-        restoreFocus();
+        if (root.onRestoreFocus)
+            root.onRestoreFocus();
+
     }
     states: [
         State {
@@ -27,7 +31,7 @@ Button {
 
             PropertyChanges {
                 target: bgRect
-                color: Qt.rgba(mSurface.r, mSurface.g, mSurface.b, 0.4)
+                color: Qt.rgba(Theme.mSurface.r, Theme.mSurface.g, Theme.mSurface.b, 0.4)
                 border.color: Qt.rgba(root.hoverColor.r, root.hoverColor.g, root.hoverColor.b, 0.7)
             }
 
@@ -41,8 +45,8 @@ Button {
         height: width
         anchors.centerIn: parent
         radius: width / 2
-        color: Qt.rgba(mSurface.r, mSurface.g, mSurface.b, 0.2)
-        border.color: Qt.rgba(mOutline.r, mOutline.g, mOutline.b, 0.4)
+        color: Qt.rgba(Theme.mSurface.r, Theme.mSurface.g, Theme.mSurface.b, 0.2)
+        border.color: Qt.rgba(Theme.mOutline.r, Theme.mOutline.g, Theme.mOutline.b, 0.4)
         border.width: 1
 
         Behavior on color {
@@ -83,7 +87,7 @@ Button {
             verticalOffset: 2
             radius: 8
             samples: 16
-            color: Qt.rgba(mShadow.r, mShadow.g, mShadow.b, 0.3)
+            color: Qt.rgba(Theme.mShadow.r, Theme.mShadow.g, Theme.mShadow.b, 0.3)
         }
 
     }

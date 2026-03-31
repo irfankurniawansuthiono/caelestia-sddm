@@ -1,15 +1,10 @@
+import "../singletons"
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 ComboBox {
     id: root
 
-    property color backgroundColor: withAlpha(mSurface, cardOpacity)
-    property color borderColor: mOutline
-    property color textColor: mOnSurface
-    property color highlightColor: mPrimary
-    property color highlightTextColor: mOnPrimary
-    property real itemRadius: passwordInputRadius
     property var onRestoreFocus: function() {
     }
 
@@ -25,16 +20,16 @@ ComboBox {
     }
 
     background: Rectangle {
-        color: root.backgroundColor
-        radius: root.itemRadius
-        border.color: root.borderColor
+        color: Theme.withAlpha(Theme.mSurface, Theme.cardOpacity)
+        radius: Theme.passwordInputRadius
+        border.color: Theme.mOutline
         border.width: 1
     }
 
     contentItem: Text {
         text: root.displayText
         font: root.font
-        color: root.textColor
+        color: Theme.mOnSurface
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Qt.AlignHCenter
         leftPadding: 0
@@ -54,28 +49,26 @@ ComboBox {
             ctx.lineTo(width, 0);
             ctx.lineTo(width / 2, height);
             ctx.closePath();
-            ctx.fillStyle = mPrimary;
+            ctx.fillStyle = Theme.mPrimary;
             ctx.fill();
         }
     }
 
     delegate: ItemDelegate {
-        // Fixed inset to fit inside popup borders and rounded corners
-        // Note: This 16px inset is required - making it dynamic breaks item width calculation
         width: root.width - 16
 
         contentItem: Text {
             text: model[root.textRole]
             font: root.font
-            color: root.highlightedIndex === index ? root.highlightTextColor : root.textColor
+            color: root.highlightedIndex === index ? Theme.mOnPrimary : Theme.mOnSurface
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Qt.AlignHCenter
             anchors.fill: parent
         }
 
         background: Rectangle {
-            color: root.highlightedIndex === index ? root.highlightColor : "transparent"
-            radius: root.itemRadius
+            color: root.highlightedIndex === index ? Theme.mPrimary : "transparent"
+            radius: Theme.passwordInputRadius
         }
 
     }
@@ -87,7 +80,6 @@ ComboBox {
 
         contentItem: ListView {
             implicitHeight: Math.min(contentHeight, 250)
-            // add some margin so it doesn't look cramped
             leftMargin: 2
             rightMargin: 2
             model: root.popup.visible ? root.delegateModel : null
@@ -99,10 +91,10 @@ ComboBox {
         }
 
         background: Rectangle {
-            color: root.backgroundColor
-            border.color: root.borderColor
+            color: Theme.withAlpha(Theme.mSurface, Theme.cardOpacity)
+            border.color: Theme.mOutline
             border.width: 1
-            radius: root.itemRadius
+            radius: Theme.passwordInputRadius
         }
 
     }

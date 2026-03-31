@@ -1,0 +1,166 @@
+import "../singletons"
+import Qt5Compat.GraphicalEffects
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+
+Item {
+    id: root
+
+    property bool isActive: true
+    property var userModel: null
+    property var sessionModel: null
+    property string buffer: ""
+    property var onRestoreFocus: null
+    property var onLogin: null
+    property alias userPicker: userPicker
+    property alias sessionPicker: sessionPicker
+
+    implicitWidth: 550
+    implicitHeight: 800
+    scale: isActive ? 0.5 : 1
+    opacity: isActive ? 0 : 1
+
+    DropShadow {
+        anchors.fill: mainCard
+        horizontalOffset: 0
+        verticalOffset: 10
+        radius: Theme.shadowRadius
+        samples: Theme.shadowSamples
+        spread: 0.2
+        color: Theme.withAlpha(Theme.mShadow, 0.55)
+        source: mainCard
+        visible: Theme.dropShadows
+        transparentBorder: true
+    }
+
+    Rectangle {
+        id: mainCard
+
+        anchors.fill: parent
+        radius: Theme.cardRadius
+        border.color: Theme.withAlpha(Theme.mPrimary, Theme.cardOpacity)
+        border.width: 1
+        opacity: Theme.cardOpacity
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 40
+            spacing: 30
+
+            Clock {
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Avatar {
+                id: avatar
+
+                Layout.alignment: Qt.AlignHCenter
+                userPicker: root.userPicker
+                userModel: root.userModel
+            }
+
+            StyledComboBox {
+                id: userPicker
+
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 380
+                Layout.preferredHeight: 55
+                model: root.userModel
+                currentIndex: root.userModel ? root.userModel.lastIndex : 0
+                textRole: "name"
+                font.family: Theme.fontFamily
+                font.pixelSize: Math.round(Theme.baseFontSize * 1.67)
+                onRestoreFocus: root.onRestoreFocus
+            }
+
+            PasswordInput {
+                id: passwordInput
+
+                Layout.alignment: Qt.AlignHCenter
+                buffer: root.buffer
+                onRestoreFocus: root.onRestoreFocus
+                onLogin: root.onLogin
+            }
+
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 20
+
+                PowerButton {
+                    id: shutBtn
+
+                    width: 70
+                    height: 70
+                    iconText: "\ue8ac"
+                    normalColor: Theme.mOnSurface
+                    hoverColor: Theme.mError
+                    onRestoreFocus: root.onRestoreFocus
+                    onClickedAction: function() {
+                        sddm.powerOff();
+                    }
+                }
+
+                PowerButton {
+                    id: rebBtn
+
+                    width: 70
+                    height: 70
+                    iconText: "\uf053"
+                    normalColor: Theme.mOnSurface
+                    hoverColor: Theme.mHover
+                    onRestoreFocus: root.onRestoreFocus
+                    onClickedAction: function() {
+                        sddm.reboot();
+                    }
+                }
+
+            }
+
+            StyledComboBox {
+                id: sessionPicker
+
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 380
+                Layout.preferredHeight: 40
+                model: root.sessionModel
+                currentIndex: root.sessionModel ? root.sessionModel.lastIndex : 0
+                textRole: "name"
+                font.family: Theme.fontFamily
+                font.pixelSize: Math.round(Theme.baseFontSize * 1.5)
+                onRestoreFocus: root.onRestoreFocus
+            }
+
+        }
+
+        gradient: Gradient {
+            GradientStop {
+                position: 0.5
+                color: Theme.withAlpha(Theme.mSurface, 0.92)
+            }
+
+            GradientStop {
+                position: 1
+                color: Theme.withAlpha(Theme.mPrimary, 0.36)
+            }
+
+        }
+
+    }
+
+    Behavior on scale {
+        NumberAnimation {
+            duration: Theme.animDurationNormal
+            easing.type: Easing.OutBack
+        }
+
+    }
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: Theme.animDurationNormal
+            easing.type: Easing.OutBack
+        }
+
+    }
+
+}
