@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 # QML Linter Script
-# Usage: ./scripts/lint.sh [-v] [files...]
+# Usage: ./scripts/dev/lint.sh [-v] [files...]
 #   -v  Verbose mode (show all files checked)
 # If no files specified, checks all .qml files in the project
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERBOSE=0
 FAILURES=0
 
@@ -44,29 +44,13 @@ main() {
     local files=()
 
     if [ $# -gt 0 ]; then
+        # Use files provided as arguments
         files=("$@")
     else
-        # Check if in git repo and only lint changed files
-        if git rev-parse --git-dir >/dev/null 2>&1; then
-            # Only lint staged or modified .qml files
-            while IFS= read -r -d '' file; do
-                if [[ "$file" == *.qml ]]; then
-                    files+=("$file")
-                fi
-            done < <(git diff --cached --name-only -z --diff-filter=ACM 2>/dev/null)
-            
-            if [ ${#files[@]} -eq 0 ]; then
-                # Fallback to all .qml files if no staged changes
-                while IFS= read -r -d '' file; do
-                    files+=("$file")
-                done < <(find "$PROJECT_ROOT" -name "*.qml" -print0 2>/dev/null)
-            fi
-        else
-            # Not in git repo, check all .qml files
-            while IFS= read -r -d '' file; do
-                files+=("$file")
-            done < <(find "$PROJECT_ROOT" -name "*.qml" -print0 2>/dev/null)
-        fi
+        # Find all .qml files in the project
+        while IFS= read -r -d '' file; do
+            files+=("$file")
+        done < <(find "$PROJECT_ROOT" -name "*.qml" -print0 2>/dev/null)
     fi
 
     if [ ${#files[@]} -eq 0 ]; then

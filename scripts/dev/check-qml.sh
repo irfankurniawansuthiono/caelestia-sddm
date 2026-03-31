@@ -2,12 +2,13 @@
 
 # Combined QML Check Script
 # Runs both linting and formatting checks
-# Blocks on linting errors, warns on formatting differences
+# Usage: ./scripts/dev/check-qml.sh [files...]
+#   If no files specified, checks all .qml files in the project
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 LINT_ERRORS=0
 FORMAT_DIFFS=0
@@ -39,7 +40,7 @@ check_file() {
     if ! diff -q <(cat "$file") <(echo "$formatted") >/dev/null 2>&1; then
         echo "⚠ Formatting differs: $file_display"
         FORMAT_DIFFS=$((FORMAT_DIFFS + 1))
-        echo "   Run: ./scripts/format.sh -i \"$file\""
+        echo "   Run: ./scripts/dev/format.sh -i \"$file\""
     fi
 
     echo "✓ $file_display"
@@ -49,23 +50,11 @@ check_file() {
 main() {
     local files=()
 
-    # Get QML files to check
-    if git rev-parse --git-dir >/dev/null 2>&1; then
-        # Check staged or modified files
-        while IFS= read -r -d '' file; do
-            if [[ "$file" == *.qml ]]; then
-                files+=("$file")
-            fi
-        done < <(git diff --cached --name-only -z --diff-filter=ACM 2>/dev/null)
-        
-        if [ ${#files[@]} -eq 0 ]; then
-            # Fallback to all .qml files
-            while IFS= read -r -d '' file; do
-                files+=("$file")
-            done < <(find "$PROJECT_ROOT" -name "*.qml" -print0 2>/dev/null)
-        fi
+    if [ $# -gt 0 ]; then
+        # Use files provided as arguments
+        files=("$@")
     else
-        # Not in git repo, check all .qml files
+        # Find all .qml files in the project
         while IFS= read -r -d '' file; do
             files+=("$file")
         done < <(find "$PROJECT_ROOT" -name "*.qml" -print0 2>/dev/null)
@@ -99,7 +88,7 @@ main() {
         exit 1
     elif [ "$FORMAT_DIFFS" -gt 0 ]; then
         echo "⚠ PASSED: Files need formatting"
-        echo "Run: ./scripts/format.sh -i to auto-format"
+        echo "Run: ./scripts/dev/format.sh -i to auto-format"
         exit 0
     else
         echo "✓ PASSED: All checks passed"

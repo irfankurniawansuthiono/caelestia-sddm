@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.15
 Rectangle {
     id: root
 
+    // ---- Custom properties from config ---- //
     property string backgroundSource: {
         var source = config.background ? config.background.toString().trim() : "";
         if (!source || source === "")
@@ -97,6 +98,7 @@ Rectangle {
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, alphaValue);
     }
 
+    // ---- Basic Properties ---- //
     width: 1920
     height: 1080
     color: mSurface
