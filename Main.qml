@@ -1,6 +1,7 @@
 import Qt5Compat.GraphicalEffects
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+// Requires Qt 6.2+ for MultiEffect
 import QtQuick.Effects
 import QtQuick.Layouts 1.15
 
@@ -61,8 +62,13 @@ Rectangle {
     property int animDurationFast: 200
     property int animDurationNormal: 300
     property int animDurationSlow: 400
+    // Shadow properties
+    property int shadowRadius: 16
+    property int shadowSamples: 32
     // State
     property bool firstInput: true
+    // Password buffer - cleared on user change, Escape, or after login attempt
+    // Note: For security, this buffer should be cleared as soon as possible
     property string buffer: ""
 
     // ---- Utility functions ---- //
@@ -104,7 +110,14 @@ Rectangle {
     }
 
     function restoreFocus() {
-        keyHandler.forceActiveFocus();
+        if (!keyHandler.activeFocus) {
+            keyHandler.forceActiveFocus();
+        }
+    }
+
+    function clearBuffer() {
+        // Clear password buffer for security
+        root.buffer = "";
     }
 
     // ---- Basic Properties ---- //
@@ -117,51 +130,66 @@ Rectangle {
 
         focus: true
         Keys.onPressed: function(event) {
+            // Handle first input activation - capture the activating character
             if (root.firstInput) {
+                if (event.text && event.text !== "" && event.text.length === 1) {
+                    root.buffer = event.text;
+                }
                 root.firstInput = false;
-                return ;
+                return;
             }
+
+            // Handle Escape key - reset to idle state
             if (event.key === Qt.Key_Escape) {
                 root.firstInput = true;
-                root.buffer = "";
-                return ;
+                clearBuffer();
+                return;
             }
+
+            // Handle navigation keys
             if (event.key === Qt.Key_Right) {
                 if (userModel.count > 0 && userPicker.currentIndex < userModel.count - 1) {
                     userPicker.currentIndex += 1;
-                    root.buffer = "";
+                    clearBuffer();
                 }
-                return ;
+                return;
             }
             if (event.key === Qt.Key_Left) {
                 if (userModel.count > 0 && userPicker.currentIndex > 0) {
                     userPicker.currentIndex -= 1;
-                    root.buffer = "";
+                    clearBuffer();
                 }
-                return ;
+                return;
             }
             if (event.key === Qt.Key_Up) {
                 if (sessionModel.count > 0 && sessionPicker.currentIndex > 0)
                     sessionPicker.currentIndex -= 1;
 
-                return ;
+                return;
             }
             if (event.key === Qt.Key_Down) {
                 if (sessionModel.count > 0 && sessionPicker.currentIndex < sessionModel.count - 1)
                     sessionPicker.currentIndex += 1;
 
-                return ;
+                return;
             }
+
+            // Handle backspace
             if (event.key === Qt.Key_Backspace) {
                 root.buffer = root.buffer.slice(0, -1);
-                return ;
+                return;
             }
+
+            // Handle enter/return for login
             if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                 sddm.login(userPicker.currentText, root.buffer, sessionPicker.currentIndex);
-                root.buffer = "";
-                return ;
+                // Clear buffer after login attempt for security
+                clearBuffer();
+                return;
             }
-            if (!root.firstInput && event.text && event.text !== "" && event.text.length === 1)
+
+            // Handle regular character input for password
+            if (event.text && event.text !== "" && event.text.length === 1)
                 root.buffer += event.text;
 
         }
@@ -232,8 +260,8 @@ Rectangle {
             anchors.fill: mainCard
             horizontalOffset: 0
             verticalOffset: 10
-            radius: 16
-            samples: 32
+            radius: shadowRadius
+            samples: shadowSamples
             spread: 0.2
             color: withAlpha(mShadow, 0.55)
             source: mainCard
@@ -474,7 +502,7 @@ Rectangle {
                                 opacity: blink ? 1 : 0
 
                                 Timer {
-                                    running: cursorIndicator.visible
+                                    running: cursorIndicator.visible && !root.firstInput
                                     repeat: true
                                     interval: 530
                                     onTriggered: cursorIndicator.blink = !cursorIndicator.blink
@@ -525,7 +553,7 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 sddm.login(userPicker.currentText, root.buffer, sessionPicker.currentIndex);
-                                root.buffer = "";
+                                clearBuffer();
                                 restoreFocus();
                             }
                         }

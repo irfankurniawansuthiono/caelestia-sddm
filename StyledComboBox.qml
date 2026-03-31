@@ -61,6 +61,7 @@ ComboBox {
 
     delegate: ItemDelegate {
         // Fixed inset to fit inside popup borders and rounded corners
+        // Note: This 16px inset is required - making it dynamic breaks item width calculation
         width: root.width - 16
 
         contentItem: Text {
