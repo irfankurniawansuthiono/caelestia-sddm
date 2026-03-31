@@ -39,9 +39,23 @@ INSTALL_DIR="/usr/share/sddm/themes/$THEME_NAME"
 
 echo "Installing Caelestia SDDM Theme..."
 
-# 1. Create theme directory and copy project files
+# 1. Create theme directory and copy only necessary theme files
 sudo mkdir -p "$INSTALL_DIR"
-sudo cp -r "$PROJECT_ROOT"/* "$INSTALL_DIR/"
+
+# Copy core theme files
+sudo cp "$PROJECT_ROOT/Main.qml" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/caelestia-sddm.qmlproject" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/metadata.desktop" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/theme.conf" "$INSTALL_DIR/"
+sudo cp "$PROJECT_ROOT/theme.conf.template" "$INSTALL_DIR/"
+
+# Copy assets
+sudo cp -r "$PROJECT_ROOT/assets" "$INSTALL_DIR/"
+
+# Copy only sync script (not dev tools or installers)
+sudo mkdir -p "$INSTALL_DIR/scripts"
+sudo cp "$PROJECT_ROOT/scripts/sync.sh" "$INSTALL_DIR/scripts/"
+
 echo "✓ Copied theme to $INSTALL_DIR"
 
 # 2. Create template configuration in user's home directory
