@@ -109,10 +109,10 @@ else
     fail "Material Symbols Outlined missing (power/reboot icons will not render)"
 fi
 
-if fc-list | grep -Eiq 'Rubik|Sans'; then
-    ok "Rubik or a system Sans font is installed"
+if fc-list | grep -Eiq 'Rubik'; then
+    ok "Rubik font is installed"
 else
-    fail "No usable UI text font found (Rubik/Sans)"
+    fail "No usable UI text font found (Rubik)"
 fi
 
 echo
