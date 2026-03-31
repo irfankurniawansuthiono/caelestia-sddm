@@ -278,6 +278,7 @@ Rectangle {
 
                     Text {
                         id: clock
+                        renderType: Text.NativeRendering
 
                         Layout.alignment: Qt.AlignHCenter
                         text: Qt.formatTime(new Date(), "hh:mm AP")
@@ -289,10 +290,9 @@ Rectangle {
                     }
 
                     Text {
+                        renderType: Text.NativeRendering
                         Layout.alignment: Qt.AlignHCenter
                         text: Qt.formatDate(new Date(), "dddd, d MMMM yyyy")
-                        style: Text.Outline
-                        styleColor: mShadow
                         font.pixelSize: Math.round(baseFontSize * 1.83)
                         font.family: fontFamily
                         color: mOnSurfaceVariant
@@ -519,6 +519,7 @@ Rectangle {
                     border.width: 1
 
                     Text {
+                        renderType: Text.NativeRendering
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: 17
@@ -536,6 +537,7 @@ Rectangle {
                         clip: true
 
                         Text {
+                            renderType: Text.NativeRendering
                             anchors.centerIn: parent
                             font.family: fontFamily
                             font.pixelSize: Math.round(baseFontSize * 1.5)
@@ -835,6 +837,7 @@ Rectangle {
     }
 
     Text {
+        renderType: Text.NativeRendering
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 30
