@@ -151,8 +151,8 @@ Rectangle {
 
         anchors.centerIn: parent
         isActive: root.firstInput
-        userModel: userModel
-        sessionModel: sessionModel
+        usersModel: userModel
+        sessionsModel: sessionModel
         buffer: root.buffer
         onRestoreFocus: restoreFocus
         onLogin: function() {

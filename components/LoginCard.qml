@@ -7,8 +7,8 @@ Item {
     id: root
 
     property bool isActive: true
-    property var userModel: null
-    property var sessionModel: null
+    property var usersModel: null
+    property var sessionsModel: null
     property string buffer: ""
     property var onRestoreFocus: null
     property var onLogin: null
@@ -56,7 +56,7 @@ Item {
 
                 Layout.alignment: Qt.AlignHCenter
                 userPicker: root.userPicker
-                userModel: root.userModel
+                userModel: root.usersModel
             }
 
             StyledComboBox {
@@ -65,8 +65,14 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: 380
                 Layout.preferredHeight: 55
-                model: root.userModel
-                currentIndex: root.userModel ? root.userModel.lastIndex : 0
+                model: root.usersModel
+                currentIndex: {
+                    if (!root.usersModel || root.usersModel.count <= 0)
+                        return -1;
+
+                    var idx = root.usersModel.lastIndex;
+                    return idx >= 0 && idx < root.usersModel.count ? idx : 0;
+                }
                 textRole: "name"
                 font.family: Theme.fontFamily
                 font.pixelSize: Math.round(Theme.baseFontSize * 1.67)
@@ -122,8 +128,14 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: 380
                 Layout.preferredHeight: 40
-                model: root.sessionModel
-                currentIndex: root.sessionModel ? root.sessionModel.lastIndex : 0
+                model: root.sessionsModel
+                currentIndex: {
+                    if (!root.sessionsModel || root.sessionsModel.count <= 0)
+                        return -1;
+
+                    var idx = root.sessionsModel.lastIndex;
+                    return idx >= 0 && idx < root.sessionsModel.count ? idx : 0;
+                }
                 textRole: "name"
                 font.family: Theme.fontFamily
                 font.pixelSize: Math.round(Theme.baseFontSize * 1.5)
