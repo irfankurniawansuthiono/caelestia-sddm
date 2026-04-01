@@ -12,7 +12,13 @@ ComboBox {
     focusPolicy: Qt.ClickFocus
     onActivated: onRestoreFocus()
     Keys.onPressed: function(event) {
-        if (!popup.visible) {
+        if (popup.visible) {
+            if (event.key === Qt.Key_Escape) {
+                popup.close();
+                event.accepted = true;
+                onRestoreFocus();
+            }
+        } else {
             if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 event.accepted = true;
                 onRestoreFocus();
@@ -87,6 +93,8 @@ ComboBox {
 
     popup: Popup {
         y: root.height - 1
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        onClosed: onRestoreFocus()
         width: root.width
         implicitHeight: popupList.implicitHeight
 

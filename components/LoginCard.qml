@@ -35,6 +35,7 @@ Item {
         root.isAuthenticating = false;
     }
 
+    enabled: !isActive
     implicitWidth: 550
     implicitHeight: 800
     scale: isActive ? 0.5 : 1
