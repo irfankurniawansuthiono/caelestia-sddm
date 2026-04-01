@@ -165,10 +165,9 @@ Rectangle {
 
     Connections {
         function onIsErrorChanged() {
-            if (isError) {
+            if (isError)
                 authPulseAnim.stop();
-                border.color = Theme.mError;
-            }
+
         }
 
         target: root
