@@ -20,14 +20,14 @@ Rectangle {
             return Theme.mError;
 
         if (isAuthenticating)
-            return Theme.mTertiary;
+            return Theme.mPrimary;
 
         if (buffer !== "")
             return Theme.mPrimary;
 
         return Theme.mOutline;
     }
-    border.width: isError ? 2 : 1
+    border.width: (isError || isAuthenticating) ? 2 : 1
 
     Text {
         renderType: Text.NativeRendering
@@ -165,13 +165,61 @@ Rectangle {
 
     Connections {
         function onIsErrorChanged() {
-            if (isError) {
+            if (isError)
                 authPulseAnim.stop();
-                border.color = Theme.mError;
-            }
+
         }
 
         target: root
+    }
+
+    SequentialAnimation {
+        id: shakeAnim
+
+        running: isError
+        loops: 1
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: -8
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: 8
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: -6
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: 6
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: 0
+            duration: 50
+        }
+
+    }
+
+    transform: Translate {
+        id: shakeTransform
+
+        x: 0
     }
 
     Behavior on border.color {
@@ -194,14 +242,30 @@ Rectangle {
         running: isAuthenticating && !isError
         loops: Animation.Infinite
 
+        // Pulses between lighter darker and base
+        // Base
         ColorAnimation {
-            to: Qt.lighter(Theme.mTertiary, 1.3)
-            duration: 800
+            to: Theme.mPrimary
+            duration: 250
+            easing.type: Easing.InSine
         }
 
+        // Base → Lighter
         ColorAnimation {
-            to: Theme.mTertiary
-            duration: 800
+            to: Qt.lighter(Theme.mPrimary, 1.3)
+            duration: 400
+            easing.type: Easing.InOutSine
+        }
+
+        // Lighter → Darker
+        ColorAnimation {
+            to: Qt.darker(Theme.mPrimary, 1.4)
+            duration: 500
+            easing.type: Easing.InOutSine
+        }
+
+        PauseAnimation {
+            duration: 500
         }
 
     }

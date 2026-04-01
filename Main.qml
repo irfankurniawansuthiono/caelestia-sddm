@@ -40,6 +40,7 @@ Rectangle {
         }
         Keys.onPressed: function(event) {
             if (root.firstInput) {
+                loginCard.clearError();
                 if (event.text && event.text !== "" && event.text.length === 1)
                     root.buffer = event.text;
 
@@ -78,6 +79,7 @@ Rectangle {
                 return ;
             }
             if (event.key === Qt.Key_Backspace) {
+                loginCard.clearError();
                 root.buffer = root.buffer.slice(0, -1);
                 return ;
             }
@@ -89,9 +91,7 @@ Rectangle {
             }
             if (event.text && event.text !== "" && event.text.length === 1) {
                 // Clear error state when user starts typing after a failed attempt
-                if (loginCard.isError)
-                    loginCard.clearError();
-
+                loginCard.clearError();
                 root.buffer += event.text;
             }
             // DEBUG: Shift+F to simulate failed login (toggle via debugMode in theme.conf)
