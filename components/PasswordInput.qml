@@ -173,6 +173,55 @@ Rectangle {
         target: root
     }
 
+    SequentialAnimation {
+        id: shakeAnim
+
+        running: isError
+        loops: 1
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: -8
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: 8
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: -6
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: 6
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: shakeTransform
+            property: "x"
+            to: 0
+            duration: 50
+        }
+
+    }
+
+    transform: Translate {
+        id: shakeTransform
+
+        x: 0
+    }
+
     Behavior on border.color {
         ColorAnimation {
             duration: Theme.animDurationFast
