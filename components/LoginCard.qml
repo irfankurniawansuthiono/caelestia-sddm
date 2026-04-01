@@ -14,6 +14,16 @@ Item {
     property var onLogin: null
     property alias userPicker: userPicker
     property alias sessionPicker: sessionPicker
+    property bool isError: false
+
+    function showError(msg) {
+        root.isError = true;
+        toast.show(msg);
+    }
+
+    function clearError() {
+        root.isError = false;
+    }
 
     implicitWidth: 550
     implicitHeight: 800
@@ -84,6 +94,7 @@ Item {
 
                 Layout.alignment: Qt.AlignHCenter
                 buffer: root.buffer
+                isError: root.isError
                 onRestoreFocus: root.onRestoreFocus
                 onLogin: root.onLogin
             }
@@ -157,6 +168,15 @@ Item {
 
         }
 
+    }
+
+    ToastMessage {
+        id: toast
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: -16
+        onDismissed: root.clearError()
     }
 
     Behavior on scale {

@@ -8,13 +8,14 @@ Rectangle {
     property string buffer: ""
     property var onLogin: null
     property var onRestoreFocus: null
+    property bool isError: false
 
     implicitWidth: 380
     implicitHeight: 55
     color: Theme.withAlpha(Theme.mSurface, Theme.cardOpacity)
     radius: Theme.passwordInputRadius
-    border.color: Theme.mOutline
-    border.width: 1
+    border.color: isError ? Theme.mError : Theme.mOutline
+    border.width: isError ? 2 : 1
 
     Text {
         renderType: Text.NativeRendering
@@ -146,6 +147,20 @@ Rectangle {
                 duration: Theme.animDurationFast
             }
 
+        }
+
+    }
+
+    Behavior on border.color {
+        ColorAnimation {
+            duration: Theme.animDurationFast
+        }
+
+    }
+
+    Behavior on border.width {
+        NumberAnimation {
+            duration: Theme.animDurationFast
         }
 
     }

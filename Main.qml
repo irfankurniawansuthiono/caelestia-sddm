@@ -165,6 +165,20 @@ Rectangle {
         }
     }
 
+    Connections {
+        function onLoginFailed() {
+            loginCard.showError("Incorrect password");
+            clearBuffer();
+            restoreFocus();
+        }
+
+        function onLoginSucceeded() {
+            loginCard.clearError();
+        }
+
+        target: sddm
+    }
+
     Text {
         renderType: Text.NativeRendering
         anchors.horizontalCenter: parent.horizontalCenter
