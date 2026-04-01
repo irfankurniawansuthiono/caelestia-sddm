@@ -81,12 +81,6 @@ Rectangle {
                 root.buffer = root.buffer.slice(0, -1);
                 return ;
             }
-            // DEBUG: Shift+F to simulate failed login (remove for production)
-            if (event.key === Qt.Key_F && (event.modifiers & Qt.ShiftModifier)) {
-                loginCard.showError("Incorrect password");
-                clearBuffer();
-                return ;
-            }
             if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                 loginCard.showAuthenticating();
                 sddm.login(loginCard.userPicker.currentText, root.buffer, loginCard.sessionPicker.currentIndex);
@@ -99,6 +93,12 @@ Rectangle {
                     loginCard.clearError();
 
                 root.buffer += event.text;
+            }
+            // DEBUG: Shift+F to simulate failed login (toggle via debugMode in theme.conf)
+            if (Theme.debugMode && event.key === Qt.Key_F && (event.modifiers & Qt.ShiftModifier)) {
+                loginCard.showError("Incorrect password");
+                clearBuffer();
+                return ;
             }
         }
     }
