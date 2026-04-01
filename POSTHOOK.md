@@ -19,7 +19,7 @@ Without this, posthook will fail because it waits for sudo input.
 Create a sudoers drop-in:
 
 ```bash
-sudo visudo -f /etc/sudoers.d/caelestia-sddm-sync
+export EDITOR=nano && sudo -E visudo -f /etc/sudoers.d/caelestia-sddm-sync
 ```
 
 Add this line (replace `your_username`):
