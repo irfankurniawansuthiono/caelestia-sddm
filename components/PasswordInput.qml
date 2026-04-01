@@ -20,7 +20,7 @@ Rectangle {
             return Theme.mError;
 
         if (isAuthenticating)
-            return Theme.mTertiary;
+            return Theme.mPrimary;
 
         if (buffer !== "")
             return Theme.mPrimary;
@@ -242,14 +242,30 @@ Rectangle {
         running: isAuthenticating && !isError
         loops: Animation.Infinite
 
+        // Pulses between lighter darker and base
+        // Base
         ColorAnimation {
-            to: Qt.lighter(Theme.mTertiary, 1.3)
-            duration: 800
+            to: Theme.mPrimary
+            duration: 250
+            easing.type: Easing.InSine
         }
 
+        // Base → Lighter
         ColorAnimation {
-            to: Theme.mTertiary
-            duration: 800
+            to: Qt.lighter(Theme.mPrimary, 1.3)
+            duration: 400
+            easing.type: Easing.InOutSine
+        }
+
+        // Lighter → Darker
+        ColorAnimation {
+            to: Qt.darker(Theme.mPrimary, 1.4)
+            duration: 500
+            easing.type: Easing.InOutSine
+        }
+
+        PauseAnimation {
+            duration: 500
         }
 
     }
