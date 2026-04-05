@@ -11,6 +11,11 @@ Edit `~/.config/caelestia/cli.json` and set:
     "postHook": "sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh"
 }
 ```
+If you dont have `cli.json` file setup, get them from (Under "Example Configuration"):
+
+[https://github.com/caelestia-dots/cli](https://github.com/caelestia-dots/cli#configuring)
+
+Simply copy it and paste the content to `~/.config/caelestia/cli.json`.
 
 ## 2) Allow passwordless sudo for this one command
 
