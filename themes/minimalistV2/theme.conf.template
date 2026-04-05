@@ -24,7 +24,7 @@ cardRadius=75
 # VISUAL EFFECTS
 # ============================================================================
 # Card border [true | false]
-cardBorder=true
+cardBorder=false
 
 # Card Opacity [0 to 1]
 cardOpacity=0.35
