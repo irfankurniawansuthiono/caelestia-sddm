@@ -159,7 +159,13 @@ fi
 
 # Ensure the drop-in exists too
 sudo mkdir -p /etc/sddm.conf.d
-echo -e "[Theme]\nCurrent=caelestia" | sudo tee /etc/sddm.conf.d/caelestia.conf > /dev/null
+cat <<'DROPIN' | sudo tee /etc/sddm.conf.d/caelestia.conf > /dev/null
+[General]
+GreeterEnvironment=QML_XHR_ALLOW_FILE_READ=1
+
+[Theme]
+Current=caelestia
+DROPIN
 echo "✓ Created /etc/sddm.conf.d/caelestia.conf"
 
 
